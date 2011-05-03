@@ -28,16 +28,17 @@ class Cpu(object):
         assert os.path.exists(self._CPUDIRSPATERN % number)
         self.__cpudir=self._CPUDIRSPATERN % number
         self.cpunumber=number
+        self._cpufreq_set_command = 'cpupower frequency-set'
 
     def set_governor(self, gevenor):
 
         assert gevenor in self.get_governors(), "nie ma takiej polityki!"
-        sp.call(["cpufreq-set", "-c", str(self.cpunumber), "-g", gevenor])
+        sp.call(['cpupower', 'frequency-set',  "-g", gevenor])
 
     def set_frequency(self, frequency):
 
         assert frequency in self.get_frequences(), "nie ma takiej czestotliwosci"
-        sp.call(["cpufreq-set", "-c", str(self.cpunumber), "-f", str(frequency)])
+        sp.call(['cpupower', 'frequency-set', "-f", str(frequency)])
 
 
     def get_governors(self):
@@ -178,4 +179,6 @@ def main():
     
 if __name__ == '__main__':
     main()
+
+
     
