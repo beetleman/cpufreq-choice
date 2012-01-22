@@ -28,17 +28,20 @@ class Cpu(object):
         assert os.path.exists(self._CPUDIRSPATERN % number)
         self.__cpudir=self._CPUDIRSPATERN % number
         self.cpunumber=number
-        self._cpufreq_set_command = 'cpupower frequency-set'
-
+        self._cpufreq_set_command = ['cpufreq-set']
+        #self._cpufreq_set_command = ['cpupower', 'frequency-set']
     def set_governor(self, gevenor):
 
         assert gevenor in self.get_governors(), "nie ma takiej polityki!"
-        sp.call(['cpupower', 'frequency-set',  "-g", gevenor])
+        sp.call(self._cpufreq_set_command + ["-g", gevenor,
+                                             "-c", str(self.cpunumber)])
 
     def set_frequency(self, frequency):
 
         assert frequency in self.get_frequences(), "nie ma takiej czestotliwosci"
-        sp.call(['cpupower', 'frequency-set', "-f", str(frequency)])
+        
+        sp.call(self._cpufreq_set_command + [ "-f", str(frequency),
+                                              "-c", str(self.cpunumber)])
 
 
     def get_governors(self):
@@ -151,8 +154,9 @@ class Ui(object):
         self.__loop.run()
 
     def __buttoncallback(self,rbutton, state, *user_data):
-        if not state:
+        if not state or not user_data:
             return False
+        
         if type(user_data[0])==type(int()):
             functmp=lambda c: c.set_frequency(user_data[0])
         else:
