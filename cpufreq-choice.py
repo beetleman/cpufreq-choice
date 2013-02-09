@@ -21,6 +21,7 @@ def  determineNumberOfCPUs():
     except (ImportError,NotImplementedError):
         pass
 
+
 class Cpu(object):
     _CPUDIRSPATERN = "/sys/devices/system/cpu/cpu%i/cpufreq/"
     def __init__(self, number):
@@ -28,18 +29,18 @@ class Cpu(object):
         assert os.path.exists(self._CPUDIRSPATERN % number)
         self.__cpudir=self._CPUDIRSPATERN % number
         self.cpunumber=number
-        self._cpufreq_set_command = ['cpufreq-set']
-        #self._cpufreq_set_command = ['cpupower', 'frequency-set']
+        #self._cpufreq_set_command = ['cpufreq-set']
+        self._cpufreq_set_command = ['cpupower', ]
     def set_governor(self, gevenor):
 
         assert gevenor in self.get_governors(), "nie ma takiej polityki!"
-        sp.call(self._cpufreq_set_command + ["-g", gevenor,
-                                             "-c", str(self.cpunumber)])
+        sp.call(self._cpufreq_set_command + ["-c", str(self.cpunumber), 'frequency-set',
+                                             "-g", gevenor,
+                                             ])
 
     def set_frequency(self, frequency):
 
         assert frequency in self.get_frequences(), "nie ma takiej czestotliwosci"
-        
         sp.call(self._cpufreq_set_command + [ "-f", str(frequency),
                                               "-c", str(self.cpunumber)])
 
@@ -67,9 +68,9 @@ class Cpu(object):
         with  open(governors_f) as f:
                 governors = f.read().replace("\n","")
         return governors
-        
-        
-        
+
+
+
 
 ##################################################################
 #    urwid stuf:
@@ -82,7 +83,7 @@ class Ui(object):
         self._cpus=[]
         for c in range(determineNumberOfCPUs()):
             self._cpus.append(Cpu(c))
-        
+
         #state stuff:
         state= list(set([cpu.get_governor_info() for cpu in self._cpus]))
         if len(state)!=1:
@@ -97,7 +98,7 @@ class Ui(object):
                 state=state[0]
 
         #radiobutton stuff:
-        sw_list.append(urwid.Text("Governors:"))        
+        sw_list.append(urwid.Text("Governors:"))
         for g in self._cpus[0].get_governors():
             if g=="userspace":
                 continue
@@ -121,7 +122,7 @@ class Ui(object):
                 sw_list.append(urwid.RadioButton(rb_list,"%i Mhz" % (f/1000),
                                                  state=True,
                                                  on_state_change=self.__buttoncallback,
-                                                 
+
                                                  ))
             else:
                 sw_list.append(urwid.RadioButton(rb_list,"%i Mhz" % (f/1000),
@@ -129,8 +130,8 @@ class Ui(object):
                                                  on_state_change=self.__buttoncallback,
                                                  user_data=f,
                                                  ))
-                
-        #urwid stuff:        
+
+        #urwid stuff:
         content = urwid.SimpleListWalker([
                 urwid.AttrMap(w, None, 'reveal focus') for w in sw_list
                 ])
@@ -148,7 +149,7 @@ class Ui(object):
             label.append("cpu%i: %iMhz" % (c.cpunumber, c.get_frequency_info()/1000))
         self.__cpumonitor.set_text(' '.join(label))
         self.__loop.set_alarm_in(2.0,self.__watchcpu)
-        
+
     def run(self):
         self.__loop.set_alarm_in(0.5,self.__watchcpu)
         self.__loop.run()
@@ -156,7 +157,7 @@ class Ui(object):
     def __buttoncallback(self,rbutton, state, *user_data):
         if not state or not user_data:
             return False
-        
+
         if type(user_data[0])==type(int()):
             functmp=lambda c: c.set_frequency(user_data[0])
         else:
@@ -164,11 +165,11 @@ class Ui(object):
         for c in self._cpus:
             functmp(c)
         return True
-            
+
     def __exit_on_cr(self, input):
         if input in ['q','Q','esc']:
             raise urwid.ExitMainLoop()
-        
+
     def __show_all_input(self, input, raw):
         self.__show_key.set_text("Pressed: " + " ".join([
                     unicode(i) for i in input]))
@@ -180,9 +181,6 @@ def main():
         sys.exit(1)
     ui=Ui()
     ui.run()
-    
+
 if __name__ == '__main__':
     main()
-
-
-    
