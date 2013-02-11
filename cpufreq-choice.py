@@ -41,7 +41,7 @@ class Cpu_backed(object):
     NAME = "Name"
     CMD = "command"
     def cmd_maker(self, **options):
-        tmp = []
+        tmp = [which(self.CMD)]
         for o in options.keys():
             tmp.append('-%s' % (o))
             tmp.append(str(options[o]))
@@ -64,7 +64,7 @@ class Cpu_cpupower(Cpu_backed):
     NAME = 'cpupower'
     CMD = 'cpupower'
     def cmd_maker(self, **options):
-        tmp = [self.CMD]
+        tmp = [which(self.CMD)]
         if 'c' in options.keys():
             tmp.extend(["-c",
                         str(options["c"])])
