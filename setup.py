@@ -14,5 +14,6 @@ setup(
     packages=['cpufreqc',
               'cpufreqc.libs'],
     include_package_data=True,
+    platforms='Linux',
     entry_points={"console_scripts": ["cpufreqc-tui=cpufreqc.cpufreqc_tui:main"]},
 )
