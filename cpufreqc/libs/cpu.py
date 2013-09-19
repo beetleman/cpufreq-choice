@@ -63,31 +63,32 @@ class Cpu_cpufrequtils(Cpu_backed):
     NAME = 'cpufrequtils'
     CMD = 'cpufreq-set'
 
-
+class NoBackend(Exception):
+    pass
 
 class Cpu(object):
     _CPUDIRSPATERN = "/sys/devices/system/cpu/cpu%i/cpufreq/"
     BACKEDS = [Cpu_cpupower,Cpu_cpufrequtils]
     def __init__(self, number):
-        assert type(number)==type(int())
+        assert type(number) == type(int())
         assert os.path.exists(self._CPUDIRSPATERN % number)
-        self.__cpudir=self._CPUDIRSPATERN % number
-        self.cpunumber=number
+        self.__cpudir = self._CPUDIRSPATERN % number
+        self.cpunumber = number
         self._cmd = self.get_backed()
+
 
     def get_backed(self):
         for b in self.BACKEDS:
             backend = b()
             if backend.is_available():
                 return backend
+        raise NoBackend()
 
     def set_governor(self, gevenor):
-
         assert gevenor in self.get_governors(), "nie ma takiej polityki!"
         self._cmd(c=self.cpunumber, g=gevenor)
 
     def set_frequency(self, frequency):
-
         assert frequency in self.get_frequences(), "nie ma takiej czestotliwosci"
         self._cmd(c=self.cpunumber, f=str(frequency))
 

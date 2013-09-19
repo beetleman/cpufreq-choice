@@ -5,6 +5,7 @@ import sys
 import os
 from libs.cpu import determineNumberOfCPUs
 from libs.cpu import Cpu
+from libs.cpu import NoBackend
 
 
 class Ui(object):
@@ -15,8 +16,11 @@ class Ui(object):
         sw_list=[]
         self._cpus=[]
         for c in range(determineNumberOfCPUs()):
-            self._cpus.append(Cpu(c))
-
+            try:
+                self._cpus.append(Cpu(c))
+            except NoBackend:
+                sys.stderr.write("You must install cpupower or cpufrequtils\n")
+                exit()
         #state stuff:
         state= list(set([cpu.get_governor_info() for cpu in self._cpus]))
         if len(state)!=1:
