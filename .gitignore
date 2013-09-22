@@ -3,3 +3,5 @@
 \#*
 dist/*
 Cpufreq_choice.egg-info/*
+env/*
+build/*
