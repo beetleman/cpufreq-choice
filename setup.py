@@ -2,10 +2,10 @@ from setuptools import setup
 
 setup(
     name='Cpufreq-choice',
-    version='0.1',
-    url='https://bitbucket.org/robal/cpufreq-choice',
-    description='CLI curses-based cputoold',
-    author='Mateusz Probachta aka robal',
+    version='0.2',
+    url='https://github.com/beetleman/cpufreq-choice',
+    description='CLI curses-based cputool',
+    author='Mateusz Probachta aka beetleman',
     author_email='nigrantis.tigris@gmail.com',
     license="LGPL",
     keywords="cli curses cpu system",
